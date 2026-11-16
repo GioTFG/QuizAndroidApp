@@ -15,6 +15,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -44,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -84,18 +86,27 @@ class MainActivity : ComponentActivity() {
 fun QuizApp(questions: List<QuizQuestion>, modifier: Modifier = Modifier) {
     var username by rememberSaveable { mutableStateOf("") }
     var loggedIn by rememberSaveable { mutableStateOf(false) }
-    Surface(modifier = modifier. fillMaxSize()) {
-        if (!loggedIn) {
-            LoginScreen (
-                onLogin = { name ->
-                    username = name
-                    loggedIn = true
-                }
-            )
-        } else {
-            QuizScreen(username, questions)
-            // Text("Loggato")
+    Box() {
+        Surface(modifier = Modifier
+            .fillMaxSize()
+            .align(Alignment.Center)
+        ) {
+            if (!loggedIn) {
+                LoginScreen(
+                    onLogin = { name ->
+                        username = name
+                        loggedIn = true
+                    }
+                )
+            } else {
+                QuizScreen(username, questions)
+                // Text("Loggato")
+            }
         }
+        Text("Giovanni Ancora, #391457, 16/11/2026", modifier = Modifier
+            .align(Alignment.BottomEnd)
+            .padding(0.dp, 0.dp, 10.dp, 50.dp)
+        )
     }
 }
 
