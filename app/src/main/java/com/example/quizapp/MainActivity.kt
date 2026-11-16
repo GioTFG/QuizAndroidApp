@@ -110,16 +110,6 @@ fun QuizApp(questions: List<QuizQuestion>, modifier: Modifier = Modifier) {
     }
 }
 
-/*
-@Preview(showBackground = true)
-@Composable
-fun QuizAppPreview() {
-    QuizAppTheme {
-        QuizApp()
-    }
-}
-*/
-
 @Composable
 fun LoginScreen(
     onLogin: (String) -> Unit,
@@ -165,7 +155,7 @@ fun LoginScreen(
 @Composable
 fun FlagQuestion(
     question: QuizQuestion,
-    selectedAnswer: String?,
+    selectedAnswer: String?,    // Radio button + conferma o basta così?
     onAnswer: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -218,7 +208,6 @@ fun FlagQuestion(
 fun QuizScreen(
     username: String,
     questions: List<QuizQuestion>,
-    modifier: Modifier = Modifier
 ) {
     var score: Int by rememberSaveable{ mutableIntStateOf(0) }
     var questionNumber: Int by rememberSaveable { mutableIntStateOf(0) }
