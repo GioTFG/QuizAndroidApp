@@ -1,3 +1,10 @@
+/**
+ * @author Giovanni Ancora
+ * Matricola UniPR: 391457
+ * Created on: 04/11/2026
+ * Github: https://github.com/GioTFG/QuizAndroidApp
+ */
+
 package com.example.quizapp
 
 import android.os.Bundle
