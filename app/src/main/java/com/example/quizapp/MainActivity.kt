@@ -49,6 +49,10 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.quizapp.ui.theme.QuizAppTheme
 
 // ---------- Data ----------
@@ -58,13 +62,33 @@ data class QuizQuestion(
     val correctAnswer : String
 )
 
-class MainActivity : ComponentActivity() {
-    // The PNG files must be placed in res/drawable with these names
+data class QuizUIState(
+    val questionNumber: Int = 0,
+    val score: Int = 0
+)
+
+class QuizViewModel: ViewModel() {
+    var uiState by mutableStateOf(QuizUIState())
+        private set
+
     val questions = listOf(
         QuizQuestion(R.drawable. flag_italy, listOf("Italy", "Ireland" ), "Italy"),
         QuizQuestion(R.drawable. flag_france, listOf("Netherlands" , "France" ), "France" ),
         QuizQuestion(R.drawable. flag_germany, listOf("Germany" , "Belgium" ), "Germany" )
     )
+
+    fun onAnswer(option: String): Unit {
+        val correct = (option == questions[uiState.questionNumber].correctAnswer)
+        uiState = uiState.copy(
+            questionNumber = uiState.questionNumber + 1,
+            score = if (correct) uiState.score + 1 else uiState.score
+        )
+    }
+}
+
+class MainActivity : ComponentActivity() {
+    // The PNG files must be placed in res/drawable with these names
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,8 +96,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             QuizAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    val vm: QuizViewModel = viewModel(
+                        factory = viewModelFactory { initializer { QuizViewModel() } }
+                    )
+
                     QuizApp(
-                        questions,
+                        vm,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -83,9 +111,13 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun QuizApp(questions: List<QuizQuestion>, modifier: Modifier = Modifier) {
+fun QuizApp(
+    viewModel: QuizViewModel,
+    modifier: Modifier = Modifier,
+) {
     var username by rememberSaveable { mutableStateOf("") }
     var loggedIn by rememberSaveable { mutableStateOf(false) }
+
     Box() {
         Surface(modifier = Modifier
             .fillMaxSize()
@@ -99,7 +131,10 @@ fun QuizApp(questions: List<QuizQuestion>, modifier: Modifier = Modifier) {
                     }
                 )
             } else {
-                QuizScreen(username, questions)
+                QuizScreen(
+                    username,
+                    viewModel,
+                )
                 // Text("Loggato")
             }
         }
@@ -155,7 +190,6 @@ fun LoginScreen(
 @Composable
 fun FlagQuestion(
     question: QuizQuestion,
-    selectedAnswer: String?,    // Radio button + conferma o basta così?
     onAnswer: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -207,21 +241,16 @@ fun FlagQuestion(
 @Composable
 fun QuizScreen(
     username: String,
-    questions: List<QuizQuestion>,
+    vm: QuizViewModel,
 ) {
-    var score: Int by rememberSaveable{ mutableIntStateOf(0) }
-    var questionNumber: Int by rememberSaveable { mutableIntStateOf(0) }
-    var selectedAnswer: String? by rememberSaveable { mutableStateOf(null) }
+    val questions = vm.questions
+    val questionNumber = vm.uiState.questionNumber
+    val score = vm.uiState.score
 
     if (questionNumber < questions.size) {
         FlagQuestion(
             questions[questionNumber],
-            selectedAnswer,
-            onAnswer = { answer ->
-                selectedAnswer = answer
-                score += if (questions[questionNumber].correctAnswer == answer) 1 else 0
-                questionNumber += 1
-            },
+            onAnswer = { opt: String -> vm.onAnswer(opt) },
             modifier = Modifier.fillMaxSize(0.5f)
         )
     } else {
@@ -229,8 +258,12 @@ fun QuizScreen(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
-        ) { Text("Congratulations, $username!\n" +
+        ) {
+            Text(
+                "Congratulations, $username!\n" +
                 "You finished the quiz!\n" +
-                "$score/${questions.size} correct answers!") }
+                "$score/${questions.size} correct answers!"
+            )
+        }
     }
 }
