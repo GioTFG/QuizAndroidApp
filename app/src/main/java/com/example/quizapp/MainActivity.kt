@@ -9,6 +9,7 @@ package com.example.quizapp
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.DrawableRes
@@ -95,6 +96,21 @@ class QuizViewModel: ViewModel() {
             screen = Screen.QUESTIONS,
         )
     }
+
+    fun onBackButtonPress() {
+        when (uiState.screen) {
+            Screen.LOGIN -> {} //TODO: Capire se è giusto fare così o fare
+                               //      tanti backHandler separati
+                               //      Se si fa così, come chiudere app?
+            Screen.QUESTIONS -> {
+                uiState = uiState.copy(
+                    questionNumber = 0,
+                    score = 0,
+                    screen = Screen.LOGIN,
+                )
+            }
+        }
+    }
 }
 
 class MainActivity : ComponentActivity() {
@@ -129,6 +145,7 @@ fun QuizApp(
     var loggedIn by rememberSaveable { mutableStateOf(false) }
 
     Box() {
+        BackHandler(onBack = viewModel::onBackButtonPress)
         Surface(modifier = Modifier
             .fillMaxSize()
             .align(Alignment.Center)
