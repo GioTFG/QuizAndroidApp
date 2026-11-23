@@ -62,9 +62,13 @@ data class QuizQuestion(
     val correctAnswer : String
 )
 
+enum class Screen { LOGIN, QUESTIONS }
+
 data class QuizUIState(
+    val username: String = "No name",
     val questionNumber: Int = 0,
-    val score: Int = 0
+    val score: Int = 0,
+    val screen: Screen = Screen.LOGIN,
 )
 
 class QuizViewModel: ViewModel() {
@@ -82,6 +86,13 @@ class QuizViewModel: ViewModel() {
         uiState = uiState.copy(
             questionNumber = uiState.questionNumber + 1,
             score = if (correct) uiState.score + 1 else uiState.score
+        )
+    }
+
+    fun onLogin(username: String) {
+        uiState = uiState.copy(
+            username = username,
+            screen = Screen.QUESTIONS,
         )
     }
 }
@@ -115,7 +126,6 @@ fun QuizApp(
     viewModel: QuizViewModel,
     modifier: Modifier = Modifier,
 ) {
-    var username by rememberSaveable { mutableStateOf("") }
     var loggedIn by rememberSaveable { mutableStateOf(false) }
 
     Box() {
@@ -123,22 +133,21 @@ fun QuizApp(
             .fillMaxSize()
             .align(Alignment.Center)
         ) {
-            if (!loggedIn) {
-                LoginScreen(
-                    onLogin = { name ->
-                        username = name
-                        loggedIn = true
-                    }
-                )
-            } else {
-                QuizScreen(
-                    username,
-                    viewModel.questions,
-                    viewModel.uiState.questionNumber,
-                    viewModel.uiState.score,
-                    viewModel::onAnswer,
-                )
-                // Text("Loggato")
+            when (viewModel.uiState.screen) {
+                Screen.LOGIN -> {
+                    LoginScreen(
+                        onLogin = viewModel::onLogin
+                    )
+                }
+                Screen.QUESTIONS -> {
+                    QuizScreen(
+                        viewModel.uiState.username,
+                        viewModel.questions,
+                        viewModel.uiState.questionNumber,
+                        viewModel.uiState.score,
+                        viewModel::onAnswer,
+                    )
+                }
             }
         }
         Text("Giovanni Ancora, #391457, 16/11/2026", modifier = Modifier
