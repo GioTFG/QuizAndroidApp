@@ -133,7 +133,10 @@ fun QuizApp(
             } else {
                 QuizScreen(
                     username,
-                    viewModel,
+                    viewModel.questions,
+                    viewModel.uiState.questionNumber,
+                    viewModel.uiState.score,
+                    viewModel::onAnswer,
                 )
                 // Text("Loggato")
             }
@@ -241,16 +244,15 @@ fun FlagQuestion(
 @Composable
 fun QuizScreen(
     username: String,
-    vm: QuizViewModel,
+    questions: List<QuizQuestion>,
+    questionNumber: Int,
+    score: Int,
+    onAnswer: (String) -> Unit,
 ) {
-    val questions = vm.questions
-    val questionNumber = vm.uiState.questionNumber
-    val score = vm.uiState.score
-
     if (questionNumber < questions.size) {
         FlagQuestion(
             questions[questionNumber],
-            onAnswer = { opt: String -> vm.onAnswer(opt) },
+            onAnswer = onAnswer,
             modifier = Modifier.fillMaxSize(0.5f)
         )
     } else {
