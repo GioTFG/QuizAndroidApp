@@ -158,10 +158,8 @@ fun QuizApp(
                 }
                 Screen.QUESTIONS -> {
                     QuizScreen(
-                        viewModel.uiState.username,
                         viewModel.questions,
-                        viewModel.uiState.questionNumber,
-                        viewModel.uiState.score,
+                        viewModel.uiState,
                         viewModel::onAnswer,
                     )
                 }
@@ -269,12 +267,14 @@ fun FlagQuestion(
 
 @Composable
 fun QuizScreen(
-    username: String,
     questions: List<QuizQuestion>,
-    questionNumber: Int,
-    score: Int,
+    uiState: QuizUIState,
     onAnswer: (String) -> Unit,
 ) {
+    val username: String = uiState.username
+    val questionNumber: Int = uiState.questionNumber
+    val score: Int = uiState.score
+
     if (questionNumber < questions.size) {
         FlagQuestion(
             questions[questionNumber],
