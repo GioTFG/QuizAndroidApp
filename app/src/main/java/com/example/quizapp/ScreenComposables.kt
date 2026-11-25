@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun LoginScreen(
-    onLogin: (String) -> Unit,
+    onLogin: (String, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     // Inside LoginScreen
@@ -50,7 +50,7 @@ fun LoginScreen(
         )
         ElevatedButton(
             onClick = {
-                onLogin(usernameState.text.toString().trim())
+                onLogin(usernameState.text.toString().trim(), passwordState.text.toString())
             },
             enabled = usernameState.text.isNotBlank()
                     && passwordState.text.isNotBlank(),

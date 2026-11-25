@@ -4,11 +4,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
 enum class Screen { LOGIN, QUESTIONS }
 
 data class QuizUIState(
+    val loginStatus: String? = null,
+
     val username: String = "No name",
     val questionNumber: Int = 0,
     val score: Int = 0,
@@ -16,7 +20,7 @@ data class QuizUIState(
 )
 
 class QuizViewModel(
-    userRepo: UsersRepository,
+    private val userRepo: UsersRepository,
 ) : ViewModel() {
     var uiState by mutableStateOf(QuizUIState())
         private set
@@ -35,11 +39,25 @@ class QuizViewModel(
         )
     }
 
-    fun onLogin(username: String) {
-        uiState = uiState.copy(
-            username = username,
-            screen = Screen.QUESTIONS,
-        )
+    fun onLogin(username: String, password: String) {
+        viewModelScope.launch {
+            val dbPassword = userRepo.getPassword(username)
+            uiState = when (dbPassword) {
+                null -> uiState.copy(
+                    loginStatus = "User not found",
+                )
+
+                password -> uiState.copy(
+                    loginStatus = "Login succeeded",
+                    username = username,
+                    screen = Screen.QUESTIONS,
+                )
+
+                else -> uiState.copy(
+                    loginStatus = "Wrong password"
+                )
+            }
+        }
     }
 
     fun restart() {
