@@ -27,7 +27,8 @@ data class LeaderboardEntry (
 
 @Dao
 interface UserDao {
-    @Insert fun insertUser(vararg c: User)
+    @Insert
+    suspend fun insertUser(vararg c: User)
 
     @Query("SELECT username, highScore FROM Users ORDER BY highScore DESC")
     fun getAllLeaderboard(): Flow<List<LeaderboardEntry>>
