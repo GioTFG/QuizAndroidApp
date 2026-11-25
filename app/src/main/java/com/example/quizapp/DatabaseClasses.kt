@@ -10,6 +10,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import kotlinx.coroutines.flow.Flow
 
 @Entity(tableName = "Users")
 data class User (
@@ -29,7 +30,7 @@ interface UserDao {
     @Insert fun insertUser(vararg c: User)
 
     @Query("SELECT username, highScore FROM Users ORDER BY highScore DESC")
-    suspend fun getAllLeaderboard(): List<LeaderboardEntry>
+    fun getAllLeaderboard(): Flow<List<LeaderboardEntry>>
 
     @Query("SELECT password FROM Users WHERE username=:username")
     suspend fun getUserPassword(username: String): String?
