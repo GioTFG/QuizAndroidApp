@@ -97,19 +97,8 @@ class QuizViewModel: ViewModel() {
         )
     }
 
-    fun onBackButtonPress() {
-        when (uiState.screen) {
-            Screen.LOGIN -> {} //TODO: Capire se è giusto fare così o fare
-                               //      tanti backHandler separati
-                               //      Se si fa così, come chiudere app?
-            Screen.QUESTIONS -> {
-                uiState = uiState.copy(
-                    questionNumber = 0,
-                    score = 0,
-                    screen = Screen.LOGIN,
-                )
-            }
-        }
+    fun restart() {
+        uiState =QuizUIState()
     }
 }
 
@@ -145,7 +134,6 @@ fun QuizApp(
     var loggedIn by rememberSaveable { mutableStateOf(false) }
 
     Box() {
-        BackHandler(onBack = viewModel::onBackButtonPress)
         Surface(modifier = Modifier
             .fillMaxSize()
             .align(Alignment.Center)
@@ -157,6 +145,7 @@ fun QuizApp(
                     )
                 }
                 Screen.QUESTIONS -> {
+                    BackHandler(true, viewModel::restart)
                     QuizScreen(
                         viewModel.questions,
                         viewModel.uiState,
