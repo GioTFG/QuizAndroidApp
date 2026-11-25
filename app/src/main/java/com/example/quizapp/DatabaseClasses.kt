@@ -53,3 +53,17 @@ abstract class UserDatabase : RoomDatabase() {
         }
     }
 }
+
+class DaoUsersRepository(private val dao: UserDao): UsersRepository {
+    override suspend fun addUsers(vararg u: User) {
+        dao.insertUser(*u)
+    }
+
+    override suspend fun getPassword(username: String): String? {
+        return dao.getUserPassword(username)
+    }
+
+    override fun getLeaderboard(): Flow<List<LeaderboardEntry>> {
+        return dao.getAllLeaderboard()
+    }
+}

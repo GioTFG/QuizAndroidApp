@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.Flow
 
 enum class Screen { LOGIN, QUESTIONS }
 
@@ -14,7 +15,9 @@ data class QuizUIState(
     val screen: Screen = Screen.LOGIN,
 )
 
-class QuizViewModel: ViewModel() {
+class QuizViewModel(
+    userRepo: UsersRepository,
+) : ViewModel() {
     var uiState by mutableStateOf(QuizUIState())
         private set
 
@@ -42,4 +45,10 @@ class QuizViewModel: ViewModel() {
     fun restart() {
         uiState =QuizUIState()
     }
+}
+
+interface UsersRepository {
+    suspend fun addUsers(vararg u: User)
+    suspend fun getPassword(username: String): String?
+    fun getLeaderboard(): Flow<List<LeaderboardEntry>>
 }

@@ -47,8 +47,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             QuizAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    val dao = UserDatabase.getInstance(applicationContext).getDao()
+                    val usersRepo = DaoUsersRepository(dao)
                     val vm: QuizViewModel = viewModel(
-                        factory = viewModelFactory { initializer { QuizViewModel() } }
+                        factory = viewModelFactory { initializer { QuizViewModel(usersRepo) } }
                     )
 
                     QuizApp(
