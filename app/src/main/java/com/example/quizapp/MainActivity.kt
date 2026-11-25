@@ -131,8 +131,6 @@ fun QuizApp(
     viewModel: QuizViewModel,
     modifier: Modifier = Modifier,
 ) {
-    var loggedIn by rememberSaveable { mutableStateOf(false) }
-
     Box() {
         Surface(modifier = Modifier
             .fillMaxSize()
