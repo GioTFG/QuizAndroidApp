@@ -76,7 +76,17 @@ fun QuizApp(
             when (viewModel.uiState.screen) {
                 Screen.LOGIN -> {
                     LoginScreen(
-                        onLogin = viewModel::onLogin
+                        onLogin = viewModel::onLogin,
+                        onGoRegisterClick = viewModel::onGoRegister,
+                        loginStatus = viewModel.uiState.loginStatus,
+                    )
+                }
+                Screen.REGISTER -> {
+                    BackHandler(true, viewModel::restart)
+                    RegisterScreen(
+                        onRegister = viewModel::onRegister,
+                        onGoLoginClick = viewModel::onGoLogin,
+                        registerStatus = viewModel.uiState.registerStatus,
                     )
                 }
                 Screen.QUESTIONS -> {

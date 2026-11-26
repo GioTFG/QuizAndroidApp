@@ -68,3 +68,8 @@ class DaoUsersRepository(private val dao: UserDao): UsersRepository {
         return dao.getAllLeaderboard()
     }
 }
+
+/*
+ * Account salvati nel db su tablet:
+ * Gio -> 1234
+ */

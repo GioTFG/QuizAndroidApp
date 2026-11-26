@@ -8,10 +8,11 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
-enum class Screen { LOGIN, QUESTIONS }
+enum class Screen { LOGIN, REGISTER, QUESTIONS }
 
 data class QuizUIState(
     val loginStatus: String? = null,
+    val registerStatus: String? = null,
 
     val username: String = "No name",
     val questionNumber: Int = 0,
@@ -26,9 +27,9 @@ class QuizViewModel(
         private set
 
     val questions = listOf(
-        QuizQuestion(R.drawable. flag_italy, listOf("Italy", "Ireland" ), "Italy"),
-        QuizQuestion(R.drawable. flag_france, listOf("Netherlands" , "France" ), "France" ),
-        QuizQuestion(R.drawable. flag_germany, listOf("Germany" , "Belgium" ), "Germany" )
+        QuizQuestion(R.drawable.flag_italy, listOf("Italy", "Ireland"), "Italy"),
+        QuizQuestion(R.drawable.flag_france, listOf("Netherlands", "France"), "France"),
+        QuizQuestion(R.drawable.flag_germany, listOf("Germany", "Belgium"), "Germany")
     )
 
     fun onAnswer(option: String): Unit {
@@ -60,8 +61,39 @@ class QuizViewModel(
         }
     }
 
+    fun onRegister(username: String, password: String) {
+        viewModelScope.launch {
+            val dbPassword = userRepo.getPassword(username)
+            when (dbPassword) {
+                null -> {
+                    userRepo.addUsers(User(username = username, password = password))
+                    uiState = uiState.copy(
+                        registerStatus = "Register succeeded",
+                        screen = Screen.LOGIN,
+                    )
+                }
+
+                else -> {
+                    uiState = uiState.copy(
+                        registerStatus = "Username not available"
+                    )
+                }
+            }
+        }
+    }
+
+    fun onGoLogin() {
+        restart()
+    }
+    fun onGoRegister() {
+        uiState = uiState.copy(
+            registerStatus = null,
+            screen = Screen.REGISTER
+        )
+    }
+
     fun restart() {
-        uiState =QuizUIState()
+        uiState = QuizUIState()
     }
 }
 

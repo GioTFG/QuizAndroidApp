@@ -26,6 +26,7 @@ import com.example.quizapp.ui.theme.QuizAppTheme
 @Composable
 fun LoginScreen(
     onLogin: (String, String) -> Unit,
+    onGoRegisterClick: () -> Unit,
     loginStatus: String? = null,
     modifier: Modifier = Modifier,
 ) {
@@ -60,9 +61,13 @@ fun LoginScreen(
             enabled = usernameState.text.isNotBlank()
                     && passwordState.text.isNotBlank(),
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth(0.75f)
                 .padding(50.dp, 0.dp)
         ) { Text("Login") }
+
+        ElevatedButton(
+            onClick = onGoRegisterClick
+        ) { Text("Or register a new account") }
 
         if (loginStatus != null) {
             Spacer(Modifier.size(24.dp))
@@ -75,6 +80,7 @@ fun LoginScreen(
 fun RegisterScreen(
     onRegister: (String, String) -> Unit,
     registerStatus: String? = null,
+    onGoLoginClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val usernameState = rememberTextFieldState()
@@ -113,6 +119,10 @@ fun RegisterScreen(
                 .fillMaxWidth(0.75f)
                 .padding(50.dp, 0.dp),
         ) { Text("Register") }
+
+        ElevatedButton(
+            onClick = onGoLoginClick
+        ) { Text("Or login to an existing account") }
 
         if (registerStatus != null) {
             Spacer(Modifier.size(24.dp))
@@ -155,11 +165,24 @@ fun QuizScreen(
 // Previews
 @Preview(showBackground = true)
 @Composable
+fun LoginScreenPreview() {
+    QuizAppTheme {
+        LoginScreen(
+            onLogin = { _, _ -> },
+            onGoRegisterClick = {},
+            loginStatus = "Prova status wow"
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
 fun RegisterScreenPreview() {
     QuizAppTheme {
         RegisterScreen(
             onRegister = { _, _ -> },
-//            registerStatus = "Prova"
+            onGoLoginClick = {},
+            registerStatus = "Prova status omg"
         )
     }
 }
