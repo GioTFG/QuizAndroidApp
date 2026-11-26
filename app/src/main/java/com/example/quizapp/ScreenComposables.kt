@@ -1,5 +1,6 @@
 package com.example.quizapp
 
+import android.widget.Space
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.OutlinedSecureTextField
 import androidx.compose.material3.OutlinedTextField
@@ -16,13 +18,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.quizapp.ui.theme.QuizAppTheme
 
 
 @Composable
 fun LoginScreen(
     onLogin: (String, String) -> Unit,
-    modifier: Modifier = Modifier
+    loginStatus: String? = null,
+    modifier: Modifier = Modifier,
 ) {
     // Inside LoginScreen
     val usernameState = rememberTextFieldState()
@@ -58,6 +63,61 @@ fun LoginScreen(
                 .fillMaxWidth()
                 .padding(50.dp, 0.dp)
         ) { Text("Login") }
+
+        if (loginStatus != null) {
+            Spacer(Modifier.size(24.dp))
+            Text(loginStatus)
+        }
+    }
+}
+
+@Composable
+fun RegisterScreen(
+    onRegister: (String, String) -> Unit,
+    registerStatus: String? = null,
+    modifier: Modifier = Modifier,
+) {
+    val usernameState = rememberTextFieldState()
+    val passwordState = rememberTextFieldState()
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text("Register new user:")
+
+        OutlinedTextField(
+            state = usernameState,
+            label = { Text("Username:") },
+            lineLimits = TextFieldLineLimits.SingleLine,
+        )
+        OutlinedTextField(
+            state = passwordState,
+            label = { Text("Password:") },
+            lineLimits = TextFieldLineLimits.SingleLine,
+        )
+
+        Spacer(modifier = Modifier.size(24.dp))
+
+        Button(
+            onClick = {
+                onRegister(
+                    usernameState.text.toString().trim(),
+                    passwordState.text.toString().trim(),
+                )
+            },
+            enabled = usernameState.text.isNotBlank()
+                    && passwordState.text.isNotBlank(),
+            modifier = Modifier
+                .fillMaxWidth(0.75f)
+                .padding(50.dp, 0.dp),
+        ) { Text("Register") }
+
+        if (registerStatus != null) {
+            Spacer(Modifier.size(24.dp))
+            Text(registerStatus)
+        }
     }
 }
 
@@ -92,3 +152,14 @@ fun QuizScreen(
     }
 }
 
+// Previews
+@Preview(showBackground = true)
+@Composable
+fun RegisterScreenPreview() {
+    QuizAppTheme {
+        RegisterScreen(
+            onRegister = { _, _ -> },
+//            registerStatus = "Prova"
+        )
+    }
+}
