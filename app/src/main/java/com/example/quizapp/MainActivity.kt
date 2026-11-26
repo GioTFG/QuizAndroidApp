@@ -92,7 +92,6 @@ fun QuizApp(
                 Screen.QUESTIONS -> {
                     BackHandler(true, viewModel::restart)
                     QuizScreen(
-                        viewModel.questions,
                         viewModel.uiState,
                         viewModel::onAnswer,
                     )

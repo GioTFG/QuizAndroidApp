@@ -7,12 +7,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import kotlin.collections.listOf
 
 enum class Screen { LOGIN, REGISTER, QUESTIONS }
 
 data class QuizUIState(
     val loginStatus: String? = null,
     val registerStatus: String? = null,
+
+    val questions: List<QuizQuestion> = listOf(
+            QuizQuestion(R.drawable.flag_italy, listOf("Italy", "Ireland"), "Italy"),
+            QuizQuestion(R.drawable.flag_france, listOf("Netherlands", "France"), "France"),
+            QuizQuestion(R.drawable.flag_germany, listOf("Germany", "Belgium"), "Germany")
+    ),
 
     val username: String = "No name",
     val questionNumber: Int = 0,
@@ -23,17 +30,16 @@ data class QuizUIState(
 class QuizViewModel(
     private val userRepo: UsersRepository,
 ) : ViewModel() {
-    var uiState by mutableStateOf(QuizUIState())
+    var uiState by mutableStateOf(
+        QuizUIState(
+
+        )
+    )
         private set
 
-    val questions = listOf(
-        QuizQuestion(R.drawable.flag_italy, listOf("Italy", "Ireland"), "Italy"),
-        QuizQuestion(R.drawable.flag_france, listOf("Netherlands", "France"), "France"),
-        QuizQuestion(R.drawable.flag_germany, listOf("Germany", "Belgium"), "Germany")
-    )
 
     fun onAnswer(option: String): Unit {
-        val correct = (option == questions[uiState.questionNumber].correctAnswer)
+        val correct = (option == uiState.questions[uiState.questionNumber].correctAnswer)
         uiState = uiState.copy(
             questionNumber = uiState.questionNumber + 1,
             score = if (correct) uiState.score + 1 else uiState.score
@@ -85,6 +91,7 @@ class QuizViewModel(
     fun onGoLogin() {
         restart()
     }
+
     fun onGoRegister() {
         uiState = uiState.copy(
             registerStatus = null,
