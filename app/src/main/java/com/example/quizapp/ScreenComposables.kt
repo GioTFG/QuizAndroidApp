@@ -148,16 +148,21 @@ fun QuizScreen(
     val questions: List<QuizQuestion> = uiState.questions
     val questionNumber: Int = uiState.questionNumber
 
-    Column {
-        Text("Question #${questionNumber}", Modifier.weight(1f))
+    Column(
+        Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text("Question #${questionNumber + 1}")
+        Spacer(Modifier.size(15.dp))
         FlagQuestion(
             questions[questionNumber],
             onAnswer = onAnswer,
             modifier = Modifier
-                .fillMaxSize(0.5f)
-                .weight(9f)
+                .fillMaxWidth(0.5f)
         )
     }
+
 
 }
 
@@ -246,6 +251,24 @@ fun LeaderboardScreenPreview() {
 
             onGoBackClick = {},
             modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun QuizScreenPreview() {
+    QuizAppTheme {
+        QuizScreen(
+            QuizUIState(
+                questions = listOf(
+                    QuizQuestion(R.drawable.flag_italy, listOf("Italy", "Ireland"), "Italy"),
+                    QuizQuestion(R.drawable.flag_france, listOf("Netherlands", "France"), "France"),
+                    QuizQuestion(R.drawable.flag_germany, listOf("Germany", "Belgium"), "Germany")
+                ),
+                questionNumber = 0,
+            ),
+            onAnswer = {}
         )
     }
 }

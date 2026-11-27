@@ -13,8 +13,7 @@ import kotlin.collections.listOf
 enum class Screen { LOGIN, REGISTER, QUESTIONS, LEADERBOARD }
 
 data class QuizUIState(
-    val loginStatus: String? = null,
-    val registerStatus: String? = null,
+    val statusMessage: String? = null,
 
     val questions: List<QuizQuestion> = listOf(
         QuizQuestion(R.drawable.flag_italy, listOf("Italy", "Ireland"), "Italy"),
@@ -90,17 +89,17 @@ class QuizViewModel(
             val dbPassword = userRepo.getPassword(username)
             uiState = when (dbPassword) {
                 null -> uiState.copy(
-                    loginStatus = "User not found",
+                    statusMessage = "User not found",
                 )
 
                 password -> uiState.copy(
-                    loginStatus = "Login succeeded",
+                    statusMessage = null,
                     username = username,
                     screen = Screen.QUESTIONS,
                 )
 
                 else -> uiState.copy(
-                    loginStatus = "Wrong password"
+                    statusMessage = "Wrong password"
                 )
             }
         }
@@ -113,14 +112,14 @@ class QuizViewModel(
                 null -> {
                     userRepo.addUsers(User(username = username, password = password))
                     uiState = uiState.copy(
-                        registerStatus = "Register succeeded",
+                        statusMessage = null,
                         screen = Screen.LOGIN,
                     )
                 }
 
                 else -> {
                     uiState = uiState.copy(
-                        registerStatus = "Username not available"
+                        statusMessage = "Username not available"
                     )
                 }
             }
@@ -133,7 +132,7 @@ class QuizViewModel(
 
     fun onGoRegister() {
         uiState = uiState.copy(
-            registerStatus = null,
+            statusMessage = null,
             screen = Screen.REGISTER,
             leaderboard = uiState.leaderboard
         )

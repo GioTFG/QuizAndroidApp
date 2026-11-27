@@ -78,7 +78,7 @@ fun QuizApp(
                     LoginScreen(
                         onLogin = viewModel::onLogin,
                         onGoRegisterClick = viewModel::onGoRegister,
-                        loginStatus = viewModel.uiState.loginStatus,
+                        loginStatus = viewModel.uiState.statusMessage,
                     )
                 }
                 Screen.REGISTER -> {
@@ -86,7 +86,7 @@ fun QuizApp(
                     RegisterScreen(
                         onRegister = viewModel::onRegister,
                         onGoLoginClick = viewModel::onGoLogin,
-                        registerStatus = viewModel.uiState.registerStatus,
+                        registerStatus = viewModel.uiState.statusMessage,
                     )
                 }
                 Screen.QUESTIONS -> {
@@ -107,7 +107,7 @@ fun QuizApp(
         }
         Text("Giovanni Ancora, #391457, 16/11/2026", modifier = Modifier
             .align(Alignment.BottomEnd)
-            .padding(0.dp, 0.dp, 10.dp, 50.dp)
+            .padding(0.dp, 0.dp, 10.dp, 15.dp)
         )
     }
 }
