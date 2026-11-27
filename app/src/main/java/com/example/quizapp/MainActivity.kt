@@ -96,6 +96,13 @@ fun QuizApp(
                         viewModel::onAnswer,
                     )
                 }
+                Screen.LEADERBOARD -> {
+                    BackHandler(true, viewModel::restart)
+                    LeaderboardScreen(
+                        viewModel.uiState,
+                        viewModel::restart,
+                    )
+                }
             }
         }
         Text("Giovanni Ancora, #391457, 16/11/2026", modifier = Modifier

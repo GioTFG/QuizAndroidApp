@@ -10,6 +10,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Entity(tableName = "Users")
@@ -35,6 +36,15 @@ interface UserDao {
 
     @Query("SELECT password FROM Users WHERE username=:username")
     suspend fun getUserPassword(username: String): String?
+
+    @Query("SELECT * FROM Users WHERE username=:username")
+    suspend fun getUserByUsername(username: String): User?
+
+    @Query("SELECT highScore FROM Users WHERE username=:username")
+    suspend fun getUserHighScore(username: String): Int?
+
+    @Update
+    suspend fun updateUser(u: User)
 }
 
 @Database(entities = [User::class], version = 1)
@@ -64,8 +74,18 @@ class DaoUsersRepository(private val dao: UserDao): UsersRepository {
         return dao.getUserPassword(username)
     }
 
-    override fun getLeaderboard(): Flow<List<LeaderboardEntry>> {
+
+    override fun observeLeaderboard(): Flow<List<LeaderboardEntry>> {
         return dao.getAllLeaderboard()
+    }
+
+    override suspend fun getHighScore(username: String): Int? {
+        return dao.getUserHighScore(username)
+    }
+
+    override suspend fun updateHighScore(username: String, newHighScore: Int) {
+        val user: User? = dao.getUserByUsername(username)
+        if (user != null) dao.updateUser(user.copy(highScore = newHighScore))
     }
 }
 

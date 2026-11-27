@@ -145,42 +145,32 @@ fun QuizScreen(
     uiState: QuizUIState,
     onAnswer: (String) -> Unit,
 ) {
-    val username: String = uiState.username
     val questions: List<QuizQuestion> = uiState.questions
     val questionNumber: Int = uiState.questionNumber
-    val score: Int = uiState.score
 
-    if (questionNumber < questions.size) {
+    Column {
+        Text("Question #${questionNumber}", Modifier.weight(1f))
         FlagQuestion(
             questions[questionNumber],
             onAnswer = onAnswer,
-            modifier = Modifier.fillMaxSize(0.5f)
+            modifier = Modifier
+                .fillMaxSize(0.5f)
+                .weight(9f)
         )
-    } else {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                "Congratulations, $username!\n" +
-                        "You finished the quiz!\n" +
-                        "$score/${questions.size} correct answers!"
-            )
-        }
     }
+
 }
 
 @Composable
 fun LeaderboardScreen(
     uiState: QuizUIState,
-    leaderboard: List<LeaderboardEntry>,
     onGoBackClick: () -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
     val questions = uiState.questions
     val username = uiState.username
     val score = uiState.score
+    val leaderboard = uiState.leaderboard
 
     Column(
         modifier = modifier
@@ -189,13 +179,16 @@ fun LeaderboardScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Leaderboard(
-            uiState, leaderboard,
-            Modifier.weight(3f).padding(horizontal = 30.dp)
+            leaderboard,
+            Modifier
+                .weight(3f)
+                .padding(horizontal = 30.dp)
         )
         Text(
             "Congratulations, $username!\n" +
                     "You finished the quiz!\n" +
-                    "$score/${questions.size} correct answers!",
+                    "$score/${questions.size} correct answers!\n" +
+                    "You're in position #${leaderboard.indexOfFirst { it.username == username } + 1}",
             Modifier.weight(1f),
             textAlign = TextAlign.Center,
         )
@@ -243,13 +236,14 @@ fun LeaderboardScreenPreview() {
                     QuizQuestion(R.drawable.flag_france, listOf("Netherlands", "France"), "France"),
                     QuizQuestion(R.drawable.flag_germany, listOf("Germany", "Belgium"), "Germany")
                 ),
+                leaderboard = listOf(
+                    LeaderboardEntry("Gino", 10),
+                    LeaderboardEntry("Provolo", 7),
+                    LeaderboardEntry("Pinco", 6),
+                    LeaderboardEntry("Pippo", 3)
+                ),
             ),
-            leaderboard = listOf(
-                LeaderboardEntry("Gino", 10),
-                LeaderboardEntry("Provolo", 7),
-                LeaderboardEntry("Pinco", 6),
-                LeaderboardEntry("Pippo", 3)
-            ),
+
             onGoBackClick = {},
             modifier = Modifier.fillMaxSize()
         )
@@ -258,6 +252,6 @@ fun LeaderboardScreenPreview() {
 
 /*
  * TODO:
- *  Sistema dei New Record
- *  Implementa LeaderboardScreen in MainActivity
+ *  Crea composable loading screen generico, per qualsiasi attività di loading con pallino che
+ *  gira e messaggio
  */

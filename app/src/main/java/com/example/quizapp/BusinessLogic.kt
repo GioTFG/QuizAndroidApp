@@ -6,20 +6,23 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlin.collections.listOf
 
-enum class Screen { LOGIN, REGISTER, QUESTIONS }
+enum class Screen { LOGIN, REGISTER, QUESTIONS, LEADERBOARD }
 
 data class QuizUIState(
     val loginStatus: String? = null,
     val registerStatus: String? = null,
 
     val questions: List<QuizQuestion> = listOf(
-            QuizQuestion(R.drawable.flag_italy, listOf("Italy", "Ireland"), "Italy"),
-            QuizQuestion(R.drawable.flag_france, listOf("Netherlands", "France"), "France"),
-            QuizQuestion(R.drawable.flag_germany, listOf("Germany", "Belgium"), "Germany")
+        QuizQuestion(R.drawable.flag_italy, listOf("Italy", "Ireland"), "Italy"),
+        QuizQuestion(R.drawable.flag_france, listOf("Netherlands", "France"), "France"),
+        QuizQuestion(R.drawable.flag_germany, listOf("Germany", "Belgium"), "Germany")
     ),
+
+    val leaderboard: List<LeaderboardEntry> = listOf(),
 
     val username: String = "No name",
     val questionNumber: Int = 0,
@@ -37,13 +40,49 @@ class QuizViewModel(
     )
         private set
 
+    val leaderboardFlow: Flow<List<LeaderboardEntry>> = userRepo.observeLeaderboard()
+
+    init {
+        viewModelScope.launch {
+            leaderboardFlow.collect { list ->
+                uiState = uiState.copy(
+                    leaderboard = list
+                )
+            }
+        }
+    }
 
     fun onAnswer(option: String): Unit {
         val correct = (option == uiState.questions[uiState.questionNumber].correctAnswer)
-        uiState = uiState.copy(
-            questionNumber = uiState.questionNumber + 1,
-            score = if (correct) uiState.score + 1 else uiState.score
-        )
+        val newScore = if (correct) uiState.score + 1 else uiState.score
+
+        val isLast = uiState.questionNumber == uiState.questions.size - 1
+
+        when (isLast) {
+            true -> {
+                uiState = uiState.copy(
+                    score = newScore,
+                    screen = Screen.LEADERBOARD
+                )
+
+                viewModelScope.launch {
+                    val currentHighScore = userRepo.getHighScore(uiState.username)
+                        ?: throw Exception("Impossible case: username not present when somebody is logged in!")
+                    //TODO: Possibile cosa da fare, gestire gli errori con una schermata di errore
+                    //      che resetta al login e basta
+
+                    if (uiState.score > currentHighScore)
+                        userRepo.updateHighScore(uiState.username, uiState.score)
+                }
+            }
+
+            false -> {
+                uiState = uiState.copy(
+                    score = newScore,
+                    questionNumber = uiState.questionNumber + 1
+                )
+            }
+        }
     }
 
     fun onLogin(username: String, password: String) {
@@ -95,17 +134,22 @@ class QuizViewModel(
     fun onGoRegister() {
         uiState = uiState.copy(
             registerStatus = null,
-            screen = Screen.REGISTER
+            screen = Screen.REGISTER,
+            leaderboard = uiState.leaderboard
         )
     }
 
     fun restart() {
-        uiState = QuizUIState()
+        uiState = QuizUIState(
+            leaderboard = uiState.leaderboard
+        )
     }
 }
 
 interface UsersRepository {
     suspend fun addUsers(vararg u: User)
     suspend fun getPassword(username: String): String?
-    fun getLeaderboard(): Flow<List<LeaderboardEntry>>
+    fun observeLeaderboard(): Flow<List<LeaderboardEntry>>
+    suspend fun updateHighScore(username: String, newHighScore: Int)
+    suspend fun getHighScore(username: String): Int?
 }

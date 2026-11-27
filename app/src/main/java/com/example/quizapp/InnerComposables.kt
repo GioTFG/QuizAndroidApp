@@ -76,7 +76,6 @@ fun FlagQuestion(
 
 @Composable
 fun Leaderboard(
-    uiState: QuizUIState,
     leaderboard: List<LeaderboardEntry>,
     modifier: Modifier = Modifier,
 ) {
@@ -123,7 +122,6 @@ fun LeaderboardPreview() {
     QuizAppTheme {
         Box(Modifier.fillMaxSize()) {
             Leaderboard(
-                QuizUIState(),
                 listOf(
                     LeaderboardEntry("Gino", 10),
                     LeaderboardEntry("Provolo", 7),
